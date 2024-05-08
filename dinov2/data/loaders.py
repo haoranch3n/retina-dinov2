@@ -85,9 +85,9 @@ def make_dataset(
     logger.info(f'using dataset: "{dataset_str}"')
 
     class_, kwargs = _parse_dataset_str(dataset_str)
-    print(class_, kwargs)
+    # print(class_, kwargs)
     dataset = class_(transform=transform, target_transform=target_transform, **kwargs)
-    print(dataset)
+    # print(dataset)
     logger.info(f"# of dataset samples: {len(dataset):,d}")
 
     # Aggregated datasets do not expose (yet) these attributes, so add them.
