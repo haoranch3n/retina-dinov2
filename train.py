@@ -255,7 +255,10 @@ def do_train(cfg, model, resume=False):
         transform=data_transform,
         target_transform=lambda _: (),
     )
+    print('-----------')
     print(dataset)
+    print('-----------')
+
     # sampler_type = SamplerType.INFINITE
     sampler_type = SamplerType.SHARDED_INFINITE
     data_loader = make_data_loader(
@@ -269,7 +272,11 @@ def do_train(cfg, model, resume=False):
         drop_last=True,
         collate_fn=collate_fn,
     )
+    print('-----------')
+
     print(data_loader)
+    print('-----------')
+
     # training loop
 
     iteration = start_iter
