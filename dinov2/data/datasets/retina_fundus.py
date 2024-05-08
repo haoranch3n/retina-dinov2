@@ -3,6 +3,9 @@ from typing import Any, Optional, Callable, Tuple
 
 from PIL import Image
 
+from torchvision import transforms
+
+
 import os
 
 from dinov2.data.datasets.extended import ExtendedVisionDataset
