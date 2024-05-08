@@ -43,7 +43,6 @@ def _make_sample_transform(image_transform: Optional[Callable] = None, target_tr
 
 def _parse_dataset_str(dataset_str: str):
     tokens = dataset_str.split(":")
-    print(tokens)
     name = tokens[0]
     kwargs = {}
 
@@ -84,6 +83,7 @@ def make_dataset(
     logger.info(f'using dataset: "{dataset_str}"')
 
     class_, kwargs = _parse_dataset_str(dataset_str)
+    print(class_, kwargs)
     dataset = class_(transform=transform, target_transform=target_transform, **kwargs)
     print(dataset)
     logger.info(f"# of dataset samples: {len(dataset):,d}")
