@@ -12,16 +12,16 @@ from dinov2.data.datasets.extended import ExtendedVisionDataset
 
 def get_image_files(dataset_path):
     """
-    This function returns a list of all files in a directory and its subdirectories.
+    This function returns a list of all .tif files in a directory and its subdirectories.
     
-    :param dir: The directory path where you want to list all the files
-    :return: The function `list_files` returns a list of file paths for all the files in the directory
-    and its subdirectories.
+    :param dataset_path: The directory path where you want to list all the .tif files
+    :return: A list of file paths for all the .tif files in the directory and its subdirectories
     """
     images = []
     for root, _, files in os.walk(dataset_path):
         for name in files:
-            images.append(os.path.join(root, name))
+            if name.lower().endswith('.tif'):
+                images.append(os.path.join(root, name))
     return images
 
 class Fundus(ExtendedVisionDataset):
