@@ -11,6 +11,7 @@ from functools import partial
 from PIL import Image
 from fvcore.common.checkpoint import PeriodicCheckpointer
 import torch
+from torchvision import datasets, transforms
 
 # from dinov2.data import SamplerType, make_data_loader, make_dataset
 from dinov2.data.loaders import SamplerType, make_data_loader
