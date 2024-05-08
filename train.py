@@ -43,28 +43,47 @@ def list_files(dataset_path):
             images.append(os.path.join(root, name))
     return images
 
-class make_dataset(Dataset):
-    """The above class is a custom dataset class for images in PyTorch."""
-    def __init__(self, img_dir):
-        self.img_dir = img_dir
-        self.images = list_files(self.img_dir)
-        self.transform =  transforms.Compose([
-                            transforms.Resize(224),
-                            transforms.CenterCrop(224),
-                            transforms.ToTensor(),
-                            transforms.Normalize([0.485, 0.456, 0.406],
-                                                [0.229, 0.224, 0.225])
-                        ])
+def make_dataset(dataset_str, transform=None, target_transform=None):
 
-    def __len__(self):
-        return len(self.images)
+    class CustomImageDataset(Dataset):
+        """The above class is a custom dataset class for images in PyTorch."""
+        def __init__(self, root, transform=None, target_transform=None):
+            super().__init__(root, transform=transform, target_transform=target_transform)
+            self.images = list_files(root)
+            self.transform =  transforms.Compose([
+                                transforms.Resize(224),
+                                transforms.CenterCrop(224),
+                                transforms.ToTensor(),
+                                transforms.Normalize([0.485, 0.456, 0.406],
+                                                    [0.229, 0.224, 0.225])
+                            ])
 
-    def __getitem__(self, idx):
-        img_path = self.images[idx]
-        image = Image.open(img_path).convert("RGB")
-        if self.transform:
-            image = self.transform(image)
-        return image, img_path
+        def __len__(self):
+            return len(self.images)
+
+        def __getitem__(self, idx):
+            img_path = self.images[idx]
+            image = Image.open(img_path).convert("RGB")
+            if self.transform:
+                image = self.transform(image)
+            return image, 0
+
+
+# def make_dataset(dataset_str, transform=None, target_transform=None):
+#     class TIFFDataset(datasets.VisionDataset):
+#         def __init__(self, root, transform=None, target_transform=None):
+#             super().__init__(root, transform=transform, target_transform=target_transform)
+#             self.images = [os.path.join(root, f) for f in os.listdir(root) if f.endswith('.tif')]
+
+#         def __getitem__(self, index):
+#             image_path = self.images[index]
+#             image = Image.open(image_path)
+#             if self.transform:
+#                 image = self.transform(image)
+#             return image, 0  # Assuming no labels, return 0 as dummy label
+
+#         def __len__(self):
+#             return len(self.images)
 
 
 def get_args_parser(add_help: bool = True):
