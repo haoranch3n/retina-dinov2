@@ -14,8 +14,8 @@ import torch
 from torchvision import datasets, transforms
 from torch.utils.data import Dataset
 
-# from dinov2.data import SamplerType, make_data_loader, make_dataset
-from dinov2.data.loaders import SamplerType, make_data_loader
+from dinov2.data import SamplerType, make_data_loader, make_dataset
+# from dinov2.data.loaders import SamplerType, make_data_loader
 from dinov2.data import collate_data_and_cast, DataAugmentationDINO, MaskingGenerator
 import dinov2.distributed as distributed
 from dinov2.fsdp import FSDPCheckpointer
@@ -29,7 +29,7 @@ from dinov2.train.ssl_meta_arch import SSLMetaArch
 torch.backends.cuda.matmul.allow_tf32 = True  # PyTorch 1.12 sets this to False by default
 logger = logging.getLogger("dinov2")
 
-def list_files(dataset_path):
+'''def list_files(dataset_path):
     """
     This function returns a list of all files in a directory and its subdirectories.
     
@@ -83,7 +83,7 @@ def make_dataset(dataset_str, transform=None, target_transform=None):
 #             return image, 0  # Assuming no labels, return 0 as dummy label
 
 #         def __len__(self):
-#             return len(self.images)
+#             return len(self.images)'''
 
 
 def get_args_parser(add_help: bool = True):
