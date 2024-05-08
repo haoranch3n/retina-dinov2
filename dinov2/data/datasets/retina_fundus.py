@@ -35,13 +35,6 @@ class Fundus(ExtendedVisionDataset):
 
         self.root = root
         self.image_paths = get_image_files(self.root)
-        self.transform =  transforms.Compose([
-                            transforms.Resize(252),
-                            transforms.CenterCrop(252),
-                            transforms.ToTensor(),
-                            transforms.Normalize([0.485, 0.456, 0.406],
-                                                [0.229, 0.224, 0.225])
-                        ])
 
     def get_image_data(self, index: int) -> bytes:  # should return an image as an array
 
@@ -58,12 +51,12 @@ class Fundus(ExtendedVisionDataset):
             image = self.get_image_data(index)
         except Exception as e:
             raise RuntimeError(f"can not read image for sample {index}") from e
-        # target = self.get_target(index)
+        target = self.get_target(index)
 
-        if self.transform is not None:
-            image = self.transform(image)
+        if self.transforms is not None:
+            image, target = self.transforms(image, target)
 
-        return image
+        return image, target
 
     def __len__(self):
         """Returns the total number of samples."""
