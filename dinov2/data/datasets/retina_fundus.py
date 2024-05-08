@@ -69,8 +69,7 @@ class Fundus(ExtendedVisionDataset):
         return self._split
 
     def __len__(self) -> int:
-        print(self.split)
-        return self.split.length
+        return self._split.length
 
     def find_class_id(self, class_index: int) -> str:
         class_ids = self._class_ids
