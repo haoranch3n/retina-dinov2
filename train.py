@@ -255,6 +255,7 @@ def do_train(cfg, model, resume=False):
         transform=data_transform,
         target_transform=lambda _: (),
     )
+    print(type(dataset))
     # sampler_type = SamplerType.INFINITE
     sampler_type = SamplerType.SHARDED_INFINITE
     data_loader = make_data_loader(
@@ -367,7 +368,6 @@ def main(args):
             + 1
         )
         return do_test(cfg, model, f"manual_{iteration}")
-    print(cfg)
 
     do_train(cfg, model, resume=not args.no_resume)
 
