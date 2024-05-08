@@ -59,7 +59,7 @@ class Fundus(ExtendedVisionDataset):
     ) -> None:
         super().__init__(root, transforms, transform, target_transform)
         self._split = split
-
+        print(split)
         self._entries = None
         self._class_ids = None
         self._class_names = None
@@ -69,7 +69,6 @@ class Fundus(ExtendedVisionDataset):
         return self._split
 
     def __len__(self) -> int:
-        print(self._split)
         return self._split.length
 
     def find_class_id(self, class_index: int) -> str:
