@@ -39,7 +39,9 @@ class Fundus(ExtendedVisionDataset):
     def get_image_data(self, index: int) -> bytes:  # should return an image as an array
 
         image_path = self.image_paths[index]
-        # print('-------',image_path)
+        print('-------')
+        print(image_path)
+        print('-------')
         img = Image.open(image_path).convert(mode="RGB")
 
         return img
