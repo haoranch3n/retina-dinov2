@@ -8,11 +8,12 @@ import logging
 import math
 import os
 from functools import partial
-
+from PIL import Image
 from fvcore.common.checkpoint import PeriodicCheckpointer
 import torch
 
-from dinov2.data import SamplerType, make_data_loader, make_dataset
+# from dinov2.data import SamplerType, make_data_loader, make_dataset
+from dinov2.data.loaders import SamplerType, make_data_loader
 from dinov2.data import collate_data_and_cast, DataAugmentationDINO, MaskingGenerator
 import dinov2.distributed as distributed
 from dinov2.fsdp import FSDPCheckpointer
@@ -25,6 +26,22 @@ from dinov2.train.ssl_meta_arch import SSLMetaArch
 
 torch.backends.cuda.matmul.allow_tf32 = True  # PyTorch 1.12 sets this to False by default
 logger = logging.getLogger("dinov2")
+
+def make_dataset(dataset_str, transform=None, target_transform=None):
+    class TIFFDataset(datasets.VisionDataset):
+        def __init__(self, root, transform=None, target_transform=None):
+            super().__init__(root, transform=transform, target_transform=target_transform)
+            self.images = [os.path.join(root, f) for f in os.listdir(root) if f.endswith('.tif')]
+
+        def __getitem__(self, index):
+            image_path = self.images[index]
+            image = Image.open(image_path)
+            if self.transform:
+                image = self.transform(image)
+            return image, 0  # Assuming no labels, return 0 as dummy label
+
+        def __len__(self):
+            return len(self.images)
 
 
 def get_args_parser(add_help: bool = True):
