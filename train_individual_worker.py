@@ -211,8 +211,9 @@ def do_train(cfg, model, resume=False):
     # checkpointer
     print(f"Attempting to load checkpoint from {cfg.MODEL.WEIGHTS}")
     checkpointer = FSDPCheckpointer(model, cfg.train.output_dir, optimizer=optimizer, save_to_disk=True)
-    start_iter = checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
-
+    # start_iter = checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
+    start_iter = 0
+    checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume)
     OFFICIAL_EPOCH_LENGTH = cfg.train.OFFICIAL_EPOCH_LENGTH
     max_iter = cfg.optim.epochs * OFFICIAL_EPOCH_LENGTH
 
