@@ -114,7 +114,7 @@ For python-based LazyConfig, use "path.key=value".
         help="Output directory to save logs and checkpoints",
     )
     parser.add_argument("--local-rank", default=0, type=int, help="Variable for distributed computing.") 
-    parser.add_argument("--pretrained_weights", default='dinov2_vitl14', type=str, help="Name of pretrained model.")
+    parser.add_argument("--pretrained_weights", default='/cnvrg/dinov2_vitl14_pretrain.pth', type=str, help="Name of pretrained model.")
     parser.add_argument("--no_resume", default=True, type=bool, help="Whether to resume training from checkpoint.") 
     return parser
 
@@ -371,13 +371,13 @@ def main(args):
 
     if args.pretrained_weights:
         # Load the pretrained model from torch.hub
-        pretrained_model = torch.hub.load('facebookresearch/dinov2', args.pretrained_weights).to(torch.device("cuda"))
+        # pretrained_model = torch.hub.load('facebookresearch/dinov2', args.pretrained_weights).to(torch.device("cuda"))
 
         # Ensure your local model architecture matches the pretrained model if you only need to load the state dict
-        if isinstance(pretrained_model, torch.nn.Module):
-            local_model.load_state_dict(pretrained_model.state_dict(), strict=False)
-        logger.info("Loaded pretrained weights from {}".format(args.pretrained_weights))
-
+        # if isinstance(pretrained_model, torch.nn.Module):
+            # local_model.load_state_dict(pretrained_model.state_dict(), strict=False)
+        # logger.info("Loaded pretrained weights from {}".format(args.pretrained_weights))
+        cfg.MODEL.WEIGHTS = args.pretrained_weights
     logger.info("Model:\n{}".format(local_model))
 
     if args.eval_only:
