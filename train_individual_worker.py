@@ -366,7 +366,18 @@ def main(args):
     model = SSLMetaArch(cfg).to(torch.device("cuda"))
     model.prepare_for_distributed_training()
 
+    if args.pretrained_weights:
+        # Load pretrained weights
+        # checkpoint = torch.load(args.pretrained_weights, map_location="cuda")
+        checkpoint = torch.hub.load('facebookresearch/dinov2', args.pretrained_weights)
+        if 'model' in checkpoint:
+            model.load_state_dict(checkpoint['model'], strict=False)
+        else:
+            model.load_state_dict(checkpoint, strict=False)
+        logger.info("Loaded pretrained weights from {}".format(args.pretrained_weights))
+
     logger.info("Model:\n{}".format(model))
+
     if args.eval_only:
         iteration = (
             FSDPCheckpointer(model, save_dir=cfg.train.output_dir)
