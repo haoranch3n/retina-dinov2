@@ -208,7 +208,9 @@ def do_train(cfg, model, resume=False):
         last_layer_lr_schedule,
     ) = build_schedulers(cfg)
     print('-----------printing model--------')
-    print(sorted(model.state_dict().keys()))
+    # print(sorted(model.state_dict().keys()))
+    print(model.teacher.state_dict())
+    print(model.student.state_dict())
     # print(model.load_state_dict(torch.load('/cnvrg/dinov2_vitl14_pretrain.pth')))
     # checkpointer
     print(f"Attempting to load checkpoint from {cfg.MODEL.WEIGHTS}")
