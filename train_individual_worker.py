@@ -114,6 +114,7 @@ For python-based LazyConfig, use "path.key=value".
         help="Output directory to save logs and checkpoints",
     )
     parser.add_argument("--local-rank", default=0, type=int, help="Variable for distributed computing.") 
+    parser.add_argument("--pretrained_weights", default='dinov2_vitl14', type=str, help="Name of pretrained model.") 
     return parser
 
 
