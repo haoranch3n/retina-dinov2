@@ -94,8 +94,8 @@ def get_args_parser(add_help: bool = True):
         action="store_true",
         help="Whether to not attempt to resume from the checkpoint directory. ",
     )
-    parser.add_argument("--eval-only", action="store_true", help="perform evaluation only")
-    parser.add_argument("--eval", type=str, default="", help="Eval type to perform")
+    # parser.add_argument("--eval-only", action="store_true", help="perform evaluation only")
+    # parser.add_argument("--eval", type=str, default="", help="Eval type to perform")
     parser.add_argument(
         "opts",
         help="""
@@ -361,34 +361,34 @@ def do_train(cfg, model, resume=False):
     metric_logger.synchronize_between_processes()
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
-
 def main(args):
     cfg = setup(args)
-    model = SSLMetaArch(cfg).to(torch.device("cuda"))
-    model.prepare_for_distributed_training()
+    
+    # Initialize your model for configuration
+    local_model = SSLMetaArch(cfg).to(torch.device("cuda"))
+    local_model.prepare_for_distributed_training()
 
     if args.pretrained_weights:
-        # Load pretrained weights
-        # checkpoint = torch.load(args.pretrained_weights, map_location="cuda")
-        checkpoint = torch.hub.load('facebookresearch/dinov2', args.pretrained_weights)
-        if 'model' in checkpoint:
-            model.load_state_dict(checkpoint['model'], strict=False)
-        else:
-            model.load_state_dict(checkpoint, strict=False)
+        # Load the pretrained model from torch.hub
+        pretrained_model = torch.hub.load('facebookresearch/dinov2', args.pretrained_weights).to(torch.device("cuda"))
+
+        # Ensure your local model architecture matches the pretrained model if you only need to load the state dict
+        if isinstance(pretrained_model, torch.nn.Module):
+            local_model.load_state_dict(pretrained_model.state_dict(), strict=False)
         logger.info("Loaded pretrained weights from {}".format(args.pretrained_weights))
 
-    logger.info("Model:\n{}".format(model))
+    logger.info("Model:\n{}".format(local_model))
 
     if args.eval_only:
         iteration = (
-            FSDPCheckpointer(model, save_dir=cfg.train.output_dir)
+            FSDPCheckpointer(local_model, save_dir=cfg.train.output_dir)
             .resume_or_load(cfg.MODEL.WEIGHTS, resume=not args.no_resume)
             .get("iteration", -1)
             + 1
         )
-        return do_test(cfg, model, f"manual_{iteration}")
+        return do_test(cfg, local_model, f"manual_{iteration}")
 
-    do_train(cfg, model, resume=not args.no_resume)
+    do_train(cfg, local_model, resume=not args.no_resume)
 
 
 if __name__ == "__main__":
