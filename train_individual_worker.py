@@ -208,7 +208,7 @@ def do_train(cfg, model, resume=False):
         last_layer_lr_schedule,
     ) = build_schedulers(cfg)
     print('-----------printing model--------')
-    print(model)
+    print(model.load_state_dict())
     # checkpointer
     print(f"Attempting to load checkpoint from {cfg.MODEL.WEIGHTS}")
     checkpointer = FSDPCheckpointer(model, cfg.train.output_dir, optimizer=optimizer, save_to_disk=True)
