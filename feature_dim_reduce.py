@@ -14,7 +14,6 @@ dinov2_repo_dir = '/cnvrg'
 feature_dir = f'{dinov2_repo_dir}/feature/{model_name}/original'
 
 checkpoints = sorted(glob.glob(f'{feature_dir}/training*.npy'))
-print(feature_dir)
 
 def create_umap(features, numComponents, save_name):
     # Create a 2D UMAP
@@ -33,8 +32,9 @@ def create_tsne(features, numComponents, save_name):
     np.save(f'{dinov2_repo_dir}/feature/tsne-{numComponents}/{save_name}', tsne_result)
 
 for checkpoint in checkpoints:
+    print(checkpoint)
     feature_array = np.load(checkpoint)
-    feature_save_name = checkpoint[:-4] + '.npy'
+    feature_save_name = os.path.basename(checkpoint[:-4]) + '.npy'
     create_umap(feature_array, 2, feature_save_name)
     create_umap(feature_array, 20, feature_save_name)
     create_tsne(feature_array, 2, feature_save_name)
