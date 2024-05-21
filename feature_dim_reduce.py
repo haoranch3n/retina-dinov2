@@ -14,7 +14,7 @@ dinov2_repo_dir = '/cnvrg'
 feature_dir = np.load(f'{dinov2_repo_dir}/feature/{model_name}/original')
 
 checkpoints = sorted(glob.glob(f'{feature_dir}/training*.pth'))
-
+print(checkpoints)
 
 def create_umap(features, numComponents, save_name):
     # Create a 2D UMAP
