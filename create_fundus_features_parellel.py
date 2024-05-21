@@ -10,15 +10,14 @@ import ssl
 import gc
 from dinov2.models.vision_transformer import vit_base, vit_large
 import glob
+from multiprocessing import Process
 
 # Constants
-# repo_dir = '/mnt/storage1/Haoran/projects/retina/retina-dinov2'
 repo_dir = '/cnvrg'
 model_name = 'vitb16_scratch_lr_5e-04'
 model_arch = model_name.split('_')[0]
 pretrained_model = False
 train_type = 'pretrained' if pretrained_model else 'scratch'
-# feature_save_name = f'{model_name}_{train_type}'
 
 # Helper functions
 def list_files(dataset_path):
@@ -30,7 +29,6 @@ def list_files(dataset_path):
                 images.append(os.path.join(root, name))
     print(f"Found {len(images)} .tif files.")
     return images
-
 
 class CustomImageDataset(Dataset):
     def __init__(self, img_dir):
@@ -59,17 +57,11 @@ class CustomImageDataset(Dataset):
         return file_names
 
 # Example usage
-# dir_path = "/mnt/gvd0n1/Abbas/Projects/Dyer/Danielle/Fundus_batch6_April29/crop/"
 dir_path = "/data/fundus"
 dataset = CustomImageDataset(dir_path)
-# Data loader
 train_dataloader = DataLoader(dataset, batch_size=64, shuffle=False)
 
 file_names = np.array(dataset.get_file_names())
-# file_names_save_path = '/mnt/storage1/Haoran/projects/retina/retina-fundus/data/fundus_image_list.txt'
-# if not os.path.exists(file_names_save_path):
-    # np.savetxt('/mnt/storage1/Haoran/projects/retina/retina-fundus/data/fundus_image_list.txt', file_names, fmt='%s')
-
 
 # Model selection
 if model_arch == 'vitb16':
@@ -92,6 +84,7 @@ def modify_keys(pretrained_weights):
 
 # Load model weights
 ssl._create_default_https_context = ssl._create_unverified_context
+
 def create_features(train_dataloader, dinov2_model, device):
     final_img_features = []
     final_img_filepaths = []
@@ -114,32 +107,44 @@ def create_features(train_dataloader, dinov2_model, device):
             gc.collect()
     return final_img_features
 
-if pretrained_model:
-    dinov2_model = torch.hub.load('facebookresearch/dinov2', f'dinov2_{model_name}')
-else:
+def process_job(training_folder, gpu_id):
+    checkpoint_name = os.path.basename(training_folder)
+    checkpoint_path = os.path.join(training_folder, 'teacher_checkpoint.pth')
+    pretrained_weights = torch.load(checkpoint_path)['teacher']
+    pretrained_weights = modify_keys(pretrained_weights)
 
+    # Load model
+    if model_arch == 'vitb16':
+        dinov2_model = vit_base(patch_size=16, img_size=224, init_values=1.0, block_chunks=0)
+    elif model_arch == 'vitl16':
+        dinov2_model = vit_large(patch_size=16, img_size=224, init_values=1.0, block_chunks=0)
+    
+    dinov2_model.load_state_dict(pretrained_weights)
+
+    device = torch.device(f'cuda:{gpu_id}')
+    print(f"Using device: cuda:{gpu_id}")
+    dinov2_model.to(device)
+
+    # Feature extraction
+    final_img_features = create_features(train_dataloader, dinov2_model, device)
+
+    # Save features
+    final_img_features_array = np.array(final_img_features)
+    feature_dir = f'{repo_dir}/feature/{model_name}'
+    if not os.path.exists(feature_dir):
+        os.makedirs(feature_dir)
+    np.save(f'{feature_dir}/{checkpoint_name}.npy', final_img_features_array)
+
+if __name__ == "__main__":
     model_path = f'{repo_dir}/result_{model_name}/eval'
     training_folders = sorted(glob.glob(f'{model_path}/training_*'))
     print(training_folders)
 
-    for training_folder in training_folders:
-        checkpoint_name = os.path.basename(training_folder)
-        checkpoint_path = os.path.join(training_folder, 'teacher_checkpoint.pth')
-        pretrained_weights = torch.load(checkpoint_path)['teacher']
-        pretrained_weights = modify_keys(pretrained_weights)
-        dinov2_model.load_state_dict(pretrained_weights)
+    processes = []
+    for gpu_id, training_folder in enumerate(training_folders):
+        p = Process(target=process_job, args=(training_folder, gpu_id))
+        p.start()
+        processes.append(p)
 
-
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print("Using device:", device)
-        dinov2_model.to(device)
-
-
-        # Feature extraction
-        final_img_features = create_features(train_dataloader, dinov2_model, device)
-
-        # Save features
-        final_img_features_array = np.array(final_img_features)
-        if not os.path.exists(f'{repo_dir}/feature/{model_name}'):
-            os.makedirs(f'{repo_dir}/feature/{model_name}')
-        np.save(f'{repo_dir}/feature/{checkpoint_name}.npy', final_img_features_array)
+    for p in processes:
+        p.join()
