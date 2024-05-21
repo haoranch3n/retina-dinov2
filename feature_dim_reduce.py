@@ -18,21 +18,21 @@ checkpoints = sorted(glob.glob(f'{feature_dir}/training*.npy'))
 def create_umap(features, numComponents, save_name):
     umap_model = umap.UMAP(n_components=numComponents)
     umap_result = umap_model.fit_transform(features)
-    if not os.path.exists(f'{dinov2_repo_dir}/feature/umap-{numComponents}'):
-        os.makedirs(f'{dinov2_repo_dir}/feature/umap-{numComponents}')
-    np.save(f'{dinov2_repo_dir}/feature/umap-{numComponents}/{save_name}', umap_result)
+    if not os.path.exists(f'{dinov2_repo_dir}/feature/{model_name}/umap-{numComponents}'):
+        os.makedirs(f'{dinov2_repo_dir}/feature/{model_name}/umap-{numComponents}')
+    np.save(f'{dinov2_repo_dir}/feature/{model_name}/umap-{numComponents}/{save_name}', umap_result)
 
 def create_tsne(features, numComponents, save_name):
     tsne_model = TSNE(n_components=numComponents)
     tsne_result = tsne_model.fit_transform(features)
-    if not os.path.exists(f'{dinov2_repo_dir}/feature/tsne-{numComponents}'):
-        os.makedirs(f'{dinov2_repo_dir}/feature/tsne-{numComponents}')
-    np.save(f'{dinov2_repo_dir}/feature/tsne-{numComponents}/{save_name}', tsne_result)
+    if not os.path.exists(f'{dinov2_repo_dir}/feature/{model_name}/tsne-{numComponents}'):
+        os.makedirs(f'{dinov2_repo_dir}/feature/{model_name}/tsne-{numComponents}')
+    np.save(f'{dinov2_repo_dir}/feature/{model_name}/tsne-{numComponents}/{save_name}', tsne_result)
 
 for checkpoint in checkpoints:
     print(checkpoint)
     feature_array = np.load(checkpoint)
     feature_save_name = os.path.basename(checkpoint[:-4]) + '.npy'
-    create_umap(feature_array, 2, feature_save_name)
+    # create_umap(feature_array, 2, feature_save_name)
     # create_umap(feature_array, 10, feature_save_name)
-    # create_tsne(feature_array, 2, feature_save_name)
+    create_tsne(feature_array, 2, feature_save_name)
