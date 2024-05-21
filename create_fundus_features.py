@@ -12,7 +12,8 @@ from dinov2.models.vision_transformer import vit_base, vit_large
 import glob
 
 # Constants
-repo_dir = '/mnt/storage1/Haoran/projects/retina/retina-dinov2'
+# repo_dir = '/mnt/storage1/Haoran/projects/retina/retina-dinov2'
+repo_dir = '/cnvrg'
 model_name = 'vitb16_scratch_lr_5e-04'
 model_arch = model_name.split('_')[0]
 pretrained_model = False
@@ -56,15 +57,16 @@ class CustomImageDataset(Dataset):
         return file_names
 
 # Example usage
-dir_path = "/mnt/gvd0n1/Abbas/Projects/Dyer/Danielle/Fundus_batch6_April29/crop/"
+# dir_path = "/mnt/gvd0n1/Abbas/Projects/Dyer/Danielle/Fundus_batch6_April29/crop/"
+dir_path = "/data/fundus"
 dataset = CustomImageDataset(dir_path)
 # Data loader
 train_dataloader = DataLoader(dataset, batch_size=64, shuffle=False)
 
 file_names = np.array(dataset.get_file_names())
-file_names_save_path = '/mnt/storage1/Haoran/projects/retina/retina-fundus/data/fundus_image_list.txt'
-if not os.path.exists(file_names_save_path):
-    np.savetxt('/mnt/storage1/Haoran/projects/retina/retina-fundus/data/fundus_image_list.txt', file_names, fmt='%s')
+# file_names_save_path = '/mnt/storage1/Haoran/projects/retina/retina-fundus/data/fundus_image_list.txt'
+# if not os.path.exists(file_names_save_path):
+    # np.savetxt('/mnt/storage1/Haoran/projects/retina/retina-fundus/data/fundus_image_list.txt', file_names, fmt='%s')
 
 
 # Model selection
