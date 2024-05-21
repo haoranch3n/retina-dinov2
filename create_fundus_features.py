@@ -116,7 +116,7 @@ if pretrained_model:
     dinov2_model = torch.hub.load('facebookresearch/dinov2', f'dinov2_{model_name}')
 else:
 
-    model_path = f'{repo_dir}/model/result_{model_name}/eval'
+    model_path = f'{repo_dir}/result_{model_name}/eval'
     training_folders = sorted(glob.glob(f'{model_path}/training_*'))
     print(training_folders)
 
