@@ -136,4 +136,6 @@ else:
 
         # Save features
         final_img_features_array = np.array(final_img_features)
+        if os.path.notexists(f'{repo_dir}/feature/{model_name}'):
+            os.makedirs(f'{repo_dir}/feature/{model_name}')
         np.save(f'{repo_dir}/feature/{checkpoint_name}.npy', final_img_features_array)
