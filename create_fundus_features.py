@@ -24,11 +24,13 @@ train_type = 'pretrained' if pretrained_model else 'scratch'
 def list_files(dataset_path):
     print("Listing files in:", dataset_path)
     images = []
-    for root, _, files in sorted(os.walk(dataset_path))[:5]:
+    for root, _, files in sorted(os.walk(dataset_path)):
         for name in sorted(files):
-            images.append(os.path.join(root, name))
-    print(f"Found {len(images)} files.")
+            if name.lower().endswith('.tif'):
+                images.append(os.path.join(root, name))
+    print(f"Found {len(images)} .tif files.")
     return images
+
 
 class CustomImageDataset(Dataset):
     def __init__(self, img_dir):
