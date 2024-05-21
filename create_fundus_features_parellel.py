@@ -4,7 +4,6 @@ from torchvision import transforms, models
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import os
-import random
 import numpy as np
 import ssl
 import gc
@@ -110,42 +109,55 @@ def create_features(train_dataloader, dinov2_model, device):
             gc.collect()
     return final_img_features
 
-def process_job(training_folder, gpu_id):
-    checkpoint_name = os.path.basename(training_folder)
-    checkpoint_path = os.path.join(training_folder, 'teacher_checkpoint.pth')
-    pretrained_weights = torch.load(checkpoint_path)['teacher']
-    pretrained_weights = modify_keys(pretrained_weights)
+def process_job(training_folders, gpu_id):
+    for training_folder in training_folders:
+        checkpoint_name = os.path.basename(training_folder)
+        checkpoint_path = os.path.join(training_folder, 'teacher_checkpoint.pth')
+        pretrained_weights = torch.load(checkpoint_path)['teacher']
+        pretrained_weights = modify_keys(pretrained_weights)
 
-    # Load model
-    if model_arch == 'vitb16':
-        dinov2_model = vit_base(patch_size=16, img_size=224, init_values=1.0, block_chunks=0)
-    elif model_arch == 'vitl16':
-        dinov2_model = vit_large(patch_size=16, img_size=224, init_values=1.0, block_chunks=0)
-    
-    dinov2_model.load_state_dict(pretrained_weights)
+        # Load model
+        if model_arch == 'vitb16':
+            dinov2_model = vit_base(patch_size=16, img_size=224, init_values=1.0, block_chunks=0)
+        elif model_arch == 'vitl16':
+            dinov2_model = vit_large(patch_size=16, img_size=224, init_values=1.0, block_chunks=0)
+        
+        dinov2_model.load_state_dict(pretrained_weights)
 
-    device = torch.device(f'cuda:{gpu_id}')
-    print(f"Using device: cuda:{gpu_id}")
-    dinov2_model.to(device)
+        device = torch.device(f'cuda:{gpu_id}')
+        print(f"Using device: cuda:{gpu_id}")
+        dinov2_model.to(device)
 
-    # Feature extraction
-    final_img_features = create_features(train_dataloader, dinov2_model, device)
+        # Feature extraction
+        final_img_features = create_features(train_dataloader, dinov2_model, device)
 
-    # Save features
-    final_img_features_array = np.array(final_img_features)
-    feature_dir = f'{repo_dir}/feature/{model_name}'
-    if not os.path.exists(feature_dir):
-        os.makedirs(feature_dir)
-    np.save(f'{feature_dir}/{checkpoint_name}.npy', final_img_features_array)
+        # Save features
+        final_img_features_array = np.array(final_img_features)
+        feature_dir = f'{repo_dir}/feature/{model_name}'
+        if not os.path.exists(feature_dir):
+            os.makedirs(feature_dir)
+        np.save(f'{feature_dir}/{checkpoint_name}.npy', final_img_features_array)
 
 if __name__ == "__main__":
     model_path = f'{repo_dir}/result_{model_name}/eval'
     training_folders = sorted(glob.glob(f'{model_path}/training_*'))
     print(training_folders)
 
+    num_gpus = torch.cuda.device_count()
+    print(f"Number of available GPUs: {num_gpus}")
+
+    # Distribute training folders among GPUs
+    folders_per_gpu = len(training_folders) // num_gpus
     processes = []
-    for gpu_id, training_folder in enumerate(training_folders):
-        p = Process(target=process_job, args=(training_folder, gpu_id))
+    
+    for gpu_id in range(num_gpus):
+        start_idx = gpu_id * folders_per_gpu
+        end_idx = start_idx + folders_per_gpu
+        if gpu_id == num_gpus - 1:  # Last GPU takes any remaining folders
+            end_idx = len(training_folders)
+        gpu_folders = training_folders[start_idx:end_idx]
+        
+        p = Process(target=process_job, args=(gpu_folders, gpu_id))
         p.start()
         processes.append(p)
 
