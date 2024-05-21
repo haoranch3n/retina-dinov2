@@ -35,4 +35,4 @@ for checkpoint in checkpoints:
     feature_save_name = os.path.basename(checkpoint[:-4]) + '.npy'
     create_umap(feature_array, 2, feature_save_name)
     create_umap(feature_array, 20, feature_save_name)
-    create_tsne(feature_array, 2, feature_save_name)
+    # create_tsne(feature_array, 2, feature_save_name)
