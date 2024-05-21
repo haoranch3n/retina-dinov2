@@ -10,7 +10,10 @@ import ssl
 import gc
 from dinov2.models.vision_transformer import vit_base, vit_large
 import glob
-from multiprocessing import Process
+from multiprocessing import Process, set_start_method
+
+# Set the start method to 'spawn'
+set_start_method('spawn', force=True)
 
 # Constants
 repo_dir = '/cnvrg'
