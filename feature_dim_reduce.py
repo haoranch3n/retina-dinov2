@@ -11,7 +11,7 @@ model_name = 'vitb16_scratch_lr_5e-04'
 dinov2_repo_dir = '/cnvrg'
 # analysis_repo_dir = '/mnt/storage1/Haoran/projects/retina/retina-fundus'
 # Read in the feature array
-feature_dir = np.load(f'{dinov2_repo_dir}/feature/{model_name}/original')
+feature_dir = f'{dinov2_repo_dir}/feature/{model_name}/original'
 
 checkpoints = sorted(glob.glob(f'{feature_dir}/training*.pth'))
 print(checkpoints)
