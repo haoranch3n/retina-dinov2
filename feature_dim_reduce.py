@@ -17,7 +17,7 @@ checkpoints = sorted(glob.glob(f'{feature_dir}/training*.npy'))
 
 def create_umap(features, numComponents, save_name):
     umap_model = umap.UMAP(n_components=numComponents)
-    umap_result = umap_model.fit_transform(features)
+    umap_result = umap_model.fit_transform(features, num_threads=10)
     if not os.path.exists(f'{dinov2_repo_dir}/feature/umap-{numComponents}'):
         os.makedirs(f'{dinov2_repo_dir}/feature/umap-{numComponents}')
     np.save(f'{dinov2_repo_dir}/feature/umap-{numComponents}/{save_name}', umap_result)
@@ -34,5 +34,5 @@ for checkpoint in checkpoints:
     feature_array = np.load(checkpoint)
     feature_save_name = os.path.basename(checkpoint[:-4]) + '.npy'
     create_umap(feature_array, 2, feature_save_name)
-    create_umap(feature_array, 10, feature_save_name)
-    create_tsne(feature_array, 2, feature_save_name)
+    # create_umap(feature_array, 10, feature_save_name)
+    # create_tsne(feature_array, 2, feature_save_name)
