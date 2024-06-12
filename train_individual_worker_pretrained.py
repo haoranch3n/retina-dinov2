@@ -214,7 +214,7 @@ def do_train(cfg, model, resume=False):
     # print(model.load_state_dict(torch.load('/cnvrg/dinov2_vitl14_pretrain.pth')))
     # checkpointer
     # print(f"Attempting to load checkpoint from {cfg.MODEL.WEIGHTS}")
-    pretrained_model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitb14')
+    pretrained_model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitb16')
     pretrained_state_dict = pretrained_model.state_dict()
     
     def modify_keys(pretrained_weights, network_name):

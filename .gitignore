@@ -12,3 +12,6 @@ dist/
 
 model/
 feature/
+result/
+result_vitb16_scratch_lr_1e-3/
+result_vitb16_scratch_lr_5e-04/

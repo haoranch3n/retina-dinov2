@@ -1,7 +1,13 @@
 # this corresponds to the default config
 train:
   dataset_path: RecursiveImageDataset:root=~/.datasets
-  batch_size_per_gpu: 200
+  batch_size_per_gpu: 64
 student:
   arch: vit_base
   block_chunks: 4
+optim:
+  epochs: 500
+  weight_decay_end: 0.1  # Reduced weight decay
+  base_lr: 1.0e-04  # Reduced base learning rate
+  warmup_epochs: 40  # Reduced warm-up epochs
+  layerwise_decay: 1.0

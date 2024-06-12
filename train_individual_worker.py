@@ -114,7 +114,6 @@ For python-based LazyConfig, use "path.key=value".
         help="Output directory to save logs and checkpoints",
     )
     parser.add_argument("--local-rank", default=0, type=int, help="Variable for distributed computing.") 
-    parser.add_argument("--pretrained_weights", default='/cnvrg/dinov2_vitl14_pretrain.pth', type=str, help="Name of pretrained model.")
     parser.add_argument("--no_resume", default=True, type=bool, help="Whether to resume training from checkpoint.") 
     return parser
 
@@ -217,7 +216,7 @@ def do_train(cfg, model, resume=False):
     checkpointer = FSDPCheckpointer(model, cfg.train.output_dir, optimizer=optimizer, save_to_disk=True)
     # start_iter = checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
     start_iter = 0
-    checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume)
+    # checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume)
 
     
     OFFICIAL_EPOCH_LENGTH = cfg.train.OFFICIAL_EPOCH_LENGTH
@@ -371,12 +370,14 @@ def do_train(cfg, model, resume=False):
 
 def main(args):
     cfg = setup(args)
-    
+    torch.cuda.empty_cache()
+    import gc
+    gc.collect() 
     # Initialize your model for configuration
     local_model = SSLMetaArch(cfg).to(torch.device("cuda"))
     local_model.prepare_for_distributed_training()
 
-    if args.pretrained_weights:
+    # if args.pretrained_weights:
         # Load the pretrained model from torch.hub
         # pretrained_model = torch.hub.load('facebookresearch/dinov2', args.pretrained_weights).to(torch.device("cuda"))
 
@@ -384,7 +385,7 @@ def main(args):
         # if isinstance(pretrained_model, torch.nn.Module):
             # local_model.load_state_dict(pretrained_model.state_dict(), strict=False)
         # logger.info("Loaded pretrained weights from {}".format(args.pretrained_weights))
-        cfg.MODEL.WEIGHTS = args.pretrained_weights
+        # cfg.MODEL.WEIGHTS = args.pretrained_weights
     logger.info("Model:\n{}".format(local_model))
 
     if args.eval_only:
