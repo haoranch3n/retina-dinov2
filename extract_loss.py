@@ -84,6 +84,11 @@ axs[4].set_ylabel('Ibot Loss')
 axs[4].set_xlabel('Iteration')
 axs[4].legend()
 
+axs[5].plot(df['iteration'], df['lr'], label='Learning Rate', color='cyan')
+axs[5].set_ylabel('Learning Rate')
+axs[5].set_xlabel('Iteration')
+axs[5].legend()
+
 # Adjust layout
 plt.tight_layout()
 plt.savefig(f'{repo_dir}/result/extracted_losses.png', dpi=300)
