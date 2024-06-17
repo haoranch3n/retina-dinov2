@@ -4,11 +4,15 @@ import os
 import json
 
 # Path to your log file
-repo_dir = '/mnt/storage1/Haoran/projects/retina/retina-dinov2'
+# repo_dir = '/mnt/storage1/Haoran/projects/retina/retina-dinov2'
+repo_dir = '/cnvrg'
 # model_name = 'vitb16_scratch_lr_5e-04'
 # model_name = 'vitb14_pretrained_lr_5e-6'
-model_name = 'vitb16-scratch-fundus-batch-7-batchsize-64-1'
-log_file_path = f'{repo_dir}/model/{model_name}/training_metrics.json'
+# model_name = 'vitb16-scratch-fundus-batch-7-batchsize-64_lr-0.0005'
+model_name = 'vitb16-scratch-fundus-batch-7-batchsize-64_lr-0.0005'
+# model_name = 'vitb16-scratch-fundus-batch-7-batchsize-32-1'
+# model_name = 'vitb16-scratch-fundus-batch-7-batchsize-128-1'
+log_file_path = f'{repo_dir}/result/training_metrics.json'
 
 def read_multiple_json_objects(file_path):
     with open(file_path, 'r') as f:
@@ -19,7 +23,7 @@ def read_multiple_json_objects(file_path):
 
 # log_file_path = 'your_log_file_path.json'
 data = read_multiple_json_objects(log_file_path)
-data = data[62502:]
+# data = data[62502:]
 # # Read the log file and extract the relevant information
 # with open(log_file_path, 'r') as file:
 #     for line in file:
@@ -43,11 +47,11 @@ data = data[62502:]
 df = pd.DataFrame(data)
 
 # Optionally, save the DataFrame to a CSV file
-if not os.path.exists(f'{repo_dir}/loss/{model_name}'):
-    os.makedirs(f'{repo_dir}/loss/{model_name}')
-df.to_csv(f'{repo_dir}/loss/{model_name}/extracted_losses.csv', index=False)
+# if not os.path.exists(f'{repo_dir}/loss/{model_name}'):
+    # os.makedirs(f'{repo_dir}/loss/{model_name}')
+# df.to_csv(f'{repo_dir}/loss/{model_name}/extracted_losses.csv', index=False)
 
-
+print(df['total_loss'].min())
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -82,7 +86,7 @@ axs[4].legend()
 
 # Adjust layout
 plt.tight_layout()
-plt.savefig(f'{repo_dir}/loss/{model_name}/extracted_losses.png', dpi=300)
+plt.savefig(f'{repo_dir}/result/extracted_losses.png', dpi=300)
 plt.close()
 
 
