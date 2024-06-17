@@ -60,7 +60,7 @@ import matplotlib.pyplot as plt
 # df = pd.read_csv('extracted_losses.csv')
 
 # Create subplots
-fig, axs = plt.subplots(5, 1, figsize=(10, 20), sharex=True)
+fig, axs = plt.subplots(6, 1, figsize=(10, 23), sharex=True)
 
 # Plot each loss on a separate subplot
 axs[0].plot(df['iteration'], df['total_loss'], label='Total Loss', color='blue')
