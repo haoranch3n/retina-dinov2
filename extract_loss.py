@@ -60,7 +60,7 @@ import matplotlib.pyplot as plt
 # df = pd.read_csv('extracted_losses.csv')
 
 # Create subplots
-fig, axs = plt.subplots(6, 1, figsize=(10, 23), sharex=True)
+fig, axs = plt.subplots(7, 1, figsize=(10, 25), sharex=True)
 
 # Plot each loss on a separate subplot
 axs[0].plot(df['iteration'], df['total_loss'], label='Total Loss', color='blue')
@@ -88,6 +88,11 @@ axs[5].plot(df['iteration'], df['lr'], label='Learning Rate', color='cyan')
 axs[5].set_ylabel('Learning Rate')
 axs[5].set_xlabel('Iteration')
 axs[5].legend()
+
+axs[6].plot(df['iteration'], df['last_layer_lr'], label='Last Layer Learning Rate', color='maroon')
+axs[6].set_ylabel('Last Layer Learning Rate')
+axs[6].set_xlabel('Iteration')
+axs[6].legend()
 
 # Adjust layout
 plt.tight_layout()
