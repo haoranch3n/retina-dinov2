@@ -51,8 +51,9 @@ df = pd.DataFrame(data)
     # os.makedirs(f'{repo_dir}/loss/{model_name}')
 # df.to_csv(f'{repo_dir}/loss/{model_name}/extracted_losses.csv', index=False)
 
-print(df['total_loss'].min())
-import pandas as pd
+min_value = df['total_loss'].min()
+min_index = df['total_loss'].argmin()
+print(f"The minimum value is {min_value} at index {min_index}")
 import matplotlib.pyplot as plt
 
 # Assuming 'df' is your DataFrame with the extracted data
