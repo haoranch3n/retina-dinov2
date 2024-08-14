@@ -5,7 +5,7 @@ from PIL import Image
 
 from torchvision import transforms
 
-
+import numpy as np
 import os
 
 from dinov2.data.datasets.extended import ExtendedVisionDataset
@@ -34,7 +34,8 @@ class Fundus(ExtendedVisionDataset):
         super().__init__(root, transforms, transform, target_transform)
 
         self.root = root
-        self.image_paths = get_image_files(self.root)
+#         self.image_paths = get_image_files(self.root)
+        self.image_paths = np.load('/data/fundus_train_filenames.npy')
 
     def get_image_data(self, index: int) -> bytes:  # should return an image as an array
 
