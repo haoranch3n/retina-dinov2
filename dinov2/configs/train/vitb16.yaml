@@ -1,5 +1,5 @@
 train:
-  batch_size_per_gpu: 128
+  batch_size_per_gpu: 64
   dataset_path: Fundus:root=/data/fundus-batch-9
   output_dir: /cnvrg/result
   saveckp_freq: 20
@@ -34,6 +34,7 @@ optim:
   weight_decay: 0.04
   weight_decay_end: 0.1
   base_lr: 0.0001
+  lr: 7.071067811865475e-05
   warmup_epochs: 40
   min_lr: 1.0e-05
   clip_grad: 3.0
