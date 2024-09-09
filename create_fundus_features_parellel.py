@@ -16,8 +16,8 @@ set_start_method('spawn', force=True)
 
 # Constants
 repo_dir = '/cnvrg'
-model_name = 'vitb16_scratch_lr_5e-04'
-model_arch = model_name.split('_')[0]
+model_path = '/cnvrg/result_vitl_very_good/eval_simple'
+model_arch = 'vitl16'
 pretrained_model = False
 train_type = 'pretrained' if pretrained_model else 'scratch'
 
@@ -59,7 +59,7 @@ class CustomImageDataset(Dataset):
         return file_names
 
 # Example usage
-dir_path = "/data/fundus"
+dir_path = "/data/fundus-batch-9"
 dataset = CustomImageDataset(dir_path)
 train_dataloader = DataLoader(dataset, batch_size=64, shuffle=False)
 
@@ -107,7 +107,7 @@ def create_features(train_dataloader, dinov2_model, device):
             break
         finally:
             gc.collect()
-    return final_img_features
+    return final_img_filepaths, final_img_features
 
 def process_job(training_folders, gpu_id):
     for training_folder in training_folders:
@@ -129,17 +129,20 @@ def process_job(training_folders, gpu_id):
         dinov2_model.to(device)
 
         # Feature extraction
-        final_img_features = create_features(train_dataloader, dinov2_model, device)
+        final_img_filepaths, final_img_features = create_features(train_dataloader, dinov2_model, device)
+
+        final_img_filepaths = [os.path.basename(fp) for fp in final_img_filepaths]
 
         # Save features
+        final_img_filepaths_array = np.array(final_img_filepaths)
         final_img_features_array = np.array(final_img_features)
-        feature_dir = f'{repo_dir}/feature/{model_name}'
+        feature_dir = f'{repo_dir}/feature'
         if not os.path.exists(feature_dir):
             os.makedirs(feature_dir)
-        np.save(f'{feature_dir}/{checkpoint_name}.npy', final_img_features_array)
+        np.save(f'{feature_dir}/{training_folder}.npy', final_img_features_array)
+#         np.save(f'{feature_dir}/filepaths.npy', final_img_filepaths_array)
 
 if __name__ == "__main__":
-    model_path = f'{repo_dir}/result_{model_name}/eval'
     training_folders = sorted(glob.glob(f'{model_path}/training_*'))
     print(training_folders)
 
